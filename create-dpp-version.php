@@ -33,6 +33,7 @@ if ($user !=""){
 	
 	if (isset($_POST['continue'])){
 	$year_budget = $_POST['year_budget'];
+	$budget_quarter = $_POST['budget_quarter'];
 	$cost_center = $_POST['CST_CODE'];
 	$ORG_CODE = $_POST['ORG_CODE'];
 	$MRC_CODE = $_POST['MRC_CODE'];
@@ -74,7 +75,7 @@ $nodeadline = 1;
 	$reference_no = $reference_no + 1;
 	$version = 1;
 		$today = date("m/d/Y H:i");	
-		$data = array("reference_no"=>$reference_no,"ORG_CODE"=>$ORG_CODE,"MRC_CODE"=>$MRC_CODE,"year_budget"=>$year_budget,"status"=>"Unfinish","version"=>$version,"cost_center"=>$cost_center,"createdAt"=>$today,"createdBy"=>$user,"updatedAt"=>$today,"updatedBy"=>$user);	
+		$data = array("reference_no"=>$reference_no,"ORG_CODE"=>$ORG_CODE,"MRC_CODE"=>$MRC_CODE,"budget_quarter"=>$budget_quarter, "year_budget"=>$year_budget,"status"=>"Unfinish","version"=>$version,"cost_center"=>$cost_center,"createdAt"=>$today,"createdBy"=>$user,"updatedAt"=>$today,"updatedBy"=>$user);	
 		$table = "R5_DPP_VERSION";
 
 //Validation
@@ -95,6 +96,11 @@ $errorMessage .= 'Please select a year budget.\n\n';
 $errorFlag = true;
 }
 
+//Validation
+if ($budget_quarter == ""){
+	$errorMessage .= 'Please select a year quarter.\n\n';
+	$errorFlag = true;
+}
 //Validation
 if ($cost_center == ""){
 $errorMessage .= 'Please select a cost center.\n\n';
@@ -271,6 +277,18 @@ if (mrc == ""){
 					<option value="2038">2038</option>
 					<option value="2039">2039</option>
 					<option value="2040">2040</option>
+				</select>
+			</td>				
+		</tr>
+		<tr>
+			<td class="textLabel">Budget Quarter:</td>
+				<td class="textField">
+					<select name="budget_quarter" id="budget_quarter">
+					<option value="">-- Please select --</option>
+					<option value="1">1st</option>
+					<option value="2">2nd</option>
+					<option value="3">3rd</option>
+					<option value="4">4rth</option>
 				</select>
 			</td>				
 		</tr>
