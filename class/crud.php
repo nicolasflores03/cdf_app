@@ -1,5 +1,5 @@
 <?php
-$_GET['login'] = "DATABRIDGEINTERNALUSER";
+$_GET['login'] = "EAMSYSADMIN";
 class crudClass{
 
 /* Update Session*/
