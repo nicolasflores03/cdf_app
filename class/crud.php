@@ -1,4 +1,5 @@
 <?php
+$_GET['login'] = "DATABRIDGEINTERNALUSER";
 class crudClass{
 
 /* Update Session*/
@@ -1085,6 +1086,11 @@ $SES_EXPIRES2 = new DateTime($SES_EXPIRES2);
 		$resultArr = array();
         while($val = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {			
 			foreach($column as $fieldName){
+				
+				if($fieldName == "budget_quarter") {
+					$val["$fieldName"] = $this->formatBudgetQuarter($val["$fieldName"]);
+				}
+
 				$data["$fieldName"] = $val["$fieldName"];
 			}	
 			array_push($resultArr,$data);
@@ -3266,6 +3272,26 @@ $SES_EXPIRES2 = new DateTime($SES_EXPIRES2);
 		die( print_r( sqlsrv_errors(), true) );
 		}		   
 		   //error_get_last()		   
-     }
+	 }
+
+	//format budget quarter value
+	public function formatBudgetQuarter($quarter){
+		$budgetQuarter = "4rth";
+		switch($quarter)  {
+			case 1:
+				$budgetQuarter = "1st";
+			break;
+			case 2:
+				$budgetQuarter = "2nd";
+			break;
+			case 3:
+				$budgetQuarter = "3rd";
+			break;
+			case 4:
+				$budgetQuarter = "4rth";
+			break;
+		}
+		return $budgetQuarter;
+	 }
 }
 ?>

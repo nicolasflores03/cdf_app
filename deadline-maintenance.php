@@ -30,16 +30,17 @@ $orgcode = $userinfo[0]['ORG_CODE'];
 $filter = array();
 $cnd = "";
 $column = $crudapp->readColumn($conn,"R5_DEADLINE_MAINTENANCE");
-$requiredField = array('id','month','date','year','budget_year','isActive');
+$requiredField = array('id','month','date','year', 'budget_quarter','budget_year','isActive');
 $column = array_intersect($column,$requiredField);
 $listView = $crudapp->listTableDeadline($conn,"R5_DEADLINE_MAINTENANCE",$column,$cnd);
-$tableView = $filterapp->filterViewURLXdelete($conn,$column,$listView,$filter,"id");
+$tableView = $filterapp->filterViewURLXdelete($conn,$requiredField,$listView,$filter,"id");
 
 
 if (isset($_POST['submit'])){
 	//Passing of Data
 	$deadline = $_POST['deadline'];
 	$budget_year = $_POST['budget_year'];
+	$budget_quarter = $_POST['budget_quarter'];
 	$id =  @$_POST['id'];
 	$active = @$_POST['active'];
 	
@@ -53,6 +54,11 @@ $errorFlag = true;
 if ($budget_year == ""){
 $errorMessage .= 'Please select a budget year.\n\n';
 $errorFlag = true;
+}
+
+if ($budget_quarter == ""){
+	$errorMessage .= 'Please select a budget quarter.\n\n';
+	$errorFlag = true;
 }
 
 //VALIDATE DEADLINE
@@ -83,13 +89,13 @@ if(!$errorFlag){
 	$month = $deadline[0];
 	$date = $deadline[1];
 	$year = $deadline[2];
-	$data = array("year"=>$year,"month"=>$month,"date"=>$date,"year"=>$year,"budget_year"=>$budget_year,"isActive"=>$active,"createdAt"=>$today,"createdBy"=>$user,"updatedAt"=>$today,"updatedBy"=>$user);	
-	$dataupdate = array("year"=>$year,"month"=>$month,"date"=>$date,"year"=>$year,"budget_year"=>$budget_year,"isActive"=>$active,"updatedAt"=>$today,"updatedBy"=>$user);	
+	$data = array("year"=>$year,"month"=>$month,"date"=>$date,"year"=>$year,"budget_quarter"=>$budget_quarter, "budget_year"=>$budget_year,"isActive"=>$active,"createdAt"=>$today,"createdBy"=>$user,"updatedAt"=>$today,"updatedBy"=>$user);	
+	$dataupdate = array("year"=>$year,"month"=>$month,"date"=>$date,"year"=>$year,"budget_quarter"=>$budget_quarter, "budget_year"=>$budget_year,"isActive"=>$active,"updatedAt"=>$today,"updatedBy"=>$user);	
 		
 	if($id != ""){
-	$result = $crudapp->updateRecord($conn,$dataupdate,$table,"id",$id);
+		$result = $crudapp->updateRecord($conn,$dataupdate,$table,"id",$id);
 	}else{
-	$result = $crudapp->insertRecord($conn,$data,$table);
+		$result = $crudapp->insertRecord($conn,$data,$table);
 	}
 	
 	if($result) {
@@ -229,15 +235,15 @@ var text = "";
 }
 
 $(document).ready(function(){
-var user ="<?php echo $user; ?>";
+	var user ="<?php echo $user; ?>";
 	$("#newRecord").click(function() {
 		window.location = "deadline-maintenance.php?login="+user;
 	});
 	
 	
-			new datepickr('datepick2', {
-				'dateFormat': 'm/d/y'
-			});
+	new datepickr('datepick2', {
+		'dateFormat': 'm/d/y'
+	});
 
 	$("#budget_year").change(function() {
 		var budget_year = $(this).val();
@@ -424,7 +430,7 @@ var user ="<?php echo $user; ?>";
 <div class="headerText">Budget Deadline Details</div>
 	<table class="procurement" border="0" cellspacing="5px" width="100%">
 	<tbody>
-	<tr>
+		<tr>
 			<td class="textLabel">Budget Year:</td>
 				<td class="textField">
 					<select name="budget_year" id="budget_year">
@@ -460,12 +466,24 @@ var user ="<?php echo $user; ?>";
 			</td>				
 		</tr>
 		<tr>
+			<td class="textLabel">Budget Quarter:</td>
+				<td class="textField">
+					<select name="budget_quarter" id="budget_quarter">
+					<option value="">-- Please select --</option>
+					<option value="1">1st</option>
+					<option value="2">2nd</option>
+					<option value="3">3rd</option>
+					<option value="4">4rth</option>
+				</select>
+			</td>				
+		</tr>
+		<tr>
 			<td class="textLabel">Deadline:</td>
 			<td class="textField">
 						<input type="hidden" value="" id="id" name="id">
 						<input type="text" value="" id="datepick2" name="deadline">
 			</td>				
-	</tr>
+		</tr>
 		<tr>
 			<td class="textLabel">Is Active: <i class="required">*</i></td>
 			<td class="textField">	<input type="checkbox" name="active" id="active" value="1" checked>
@@ -474,8 +492,8 @@ var user ="<?php echo $user; ?>";
 	</table>
 	<!--Action Button-->
 	<div class="actionButtonCenter">
-				<input type="submit" class="bold" name="submit" id="submit" value=" Save ">
-				<input type="button" value=" Cancel " Onclick="cancel(this.form)">&nbsp;&nbsp;
+				<input type="submit" class="bold" name="submit" id="	" value=" Save ">
+				<input type="button" value="Cancel " Onclick="cancel(this.form)">&nbsp;&nbsp;
 	</div>
 	</div>
 </div>
