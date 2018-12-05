@@ -837,7 +837,8 @@ var text = "";
 }
 
 $(document).ready(function(){
-
+	$('input.scheduleField').prop('readonly', true);
+	
 //Error Message
 var res = "<?php echo @$res;?>";
 $('.isa_info').show();
@@ -1143,6 +1144,28 @@ if(expired > 0 && version < 2){
 			$(this).attr("disabled", false);
 		}
 	});
+
+	$("#budget_quarter").change(function(e) {
+		$('input.scheduleField').prop('readonly', true);
+		var quarter = $(this).val();
+		switch(quarter) {
+			case "1":
+				$('#january, #february, #march').prop('readonly', false);
+				break;
+			case "2":
+				$('#april, #may, #june').prop('readonly', false);
+				break;
+			case "3":
+				$('#july, #august, #september').prop('readonly', false);
+				break;
+			case "4":
+				$('#october, #november, #december').prop('readonly', false);
+				break;
+			default:	
+		}
+		$(".scheduleField").val(0);
+	}); 
+
 	
 	$(".scheduleField").change(function() {
 		var sched = $(this).val();
@@ -1197,7 +1220,7 @@ if(expired > 0 && version < 2){
 		<tr>
 			<td class="textLabel">Organization:</td>
 			<td class="textField"><input type="hidden" class="field" name="ref_no" id="ref_no" spellcheck="false" tabindex="1" value= "<?php echo $reference_no;?>"><input type="text" class="field" name="organization" id="organization" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['ORG_DESC'];?>" readonly><input type="hidden" class="field" name="ORG_CODE" id="ORG_CODE" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['ORG_CODE'];?>"></td>			
-			<td class="textLabel">Year Budget:</td>
+			<td class="textLabel">Budget Year:</td>
 			<td class="textField">
 				<select name="year_budget" id="year_budget" readonly>
 					<option value="">-- Please select --</option>
@@ -1234,12 +1257,22 @@ if(expired > 0 && version < 2){
 		<tr>
 			<td class="textLabel">Department:</td>
 			<td class="textField"><input type="text" class="field" name="department" id="department" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['MRC_DESC'];?>" readonly><input type="hidden" class="field" name="MRC_CODE" id="MRC_CODE" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['MRC_CODE'];?>"></td>				
-			<td class="textLabel">Remarks:</td>
-			<td class="textField"><textarea name="remarks" cols="50" readonly><?php echo $remarks;?></textarea></td>				
+			<td class="textLabel">Budget Quarter:</td>
+				<td class="textField">
+					<select name="budget_quarter" id="budget_quarter">
+					<option value="">-- Please select --</option>
+					<option value="1">1st</option>
+					<option value="2">2nd</option>
+					<option value="3">3rd</option>
+					<option value="4">4rth</option>
+				</select>
+			</td>				
 		</tr>
 		<tr>
 			<td class="textLabel">Cost Center:</td>
 			<td class="textField"><input type="text" class="field" name="cost_center" id="cost_center" spellcheck="false" tabindex="1" value="<?php echo $cost_center; ?>" readonly></td>				
+			<td class="textLabel">Remarks:</td>
+			<td class="textField"><textarea name="remarks" cols="50" readonly><?php echo $remarks;?></textarea></td>				
 		</tr>
 	</tbody>
 </table>
