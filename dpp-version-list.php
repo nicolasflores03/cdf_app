@@ -29,8 +29,8 @@ $orgcode = $userinfo[0]['ORG_CODE'];*/
 $cnd = "MRC_CODE LIKE '$MRC_CODE' AND ORG_CODE LIKE '$ORG_CODE' ORDER BY convert(int, reference_no),version ASC";
 
 $column = $crudapp->readColumn($conn,"R5_DPP_VERSION");
-$requiredField = array('reference_no','MRC_CODE','year_budget','cost_center','version','status','id');
-$column = array_intersect($column,$requiredField);
+$requiredField = array('reference_no','MRC_CODE', 'quarter_budget', 'year_budget','cost_center','version','status','id');
+$column = array_intersect($requiredField,$requiredField);
 
 $listView = $crudapp->listTable($conn,"R5_DPP_VERSION",$column,$cnd);
 
