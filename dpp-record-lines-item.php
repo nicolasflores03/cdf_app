@@ -16,6 +16,7 @@ $filterapp = new filterClass();
 $errorFlag = false;
 $errorMessage = "";
 $year = $_GET['year'];
+$quarter = isset($_GET['quarter']) ? $_GET['quarter'] : null;
 $lastDigit = substr($year, -1); 
 $user = $_GET['login'];
 $updateSession = $crudapp->updateSession($conn,$user);
@@ -23,6 +24,7 @@ $version = $_GET['version'];
 $reference_no = @$_GET['reference_no'];
 $msg = @$_GET['msg'];
 $res = @$_GET['res'];
+$selfBaseUrl = $_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&quarter=".$quarter."&reference_no=".$reference_no."&version=".$version;
 
 //GET BUDGET DEADLINE
 $deadlinefilter = "budget_year = '$year' AND isActive = '1'";
@@ -124,7 +126,7 @@ $save = $crudapp->saveApp($conn,$ref_no,$version);
 		sqlsrv_rollback( $conn );
 		//echo "Transaction rolled back.<br />";
 	}
-	header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=pass&msg=You have successfully saved the records!");
+	header("Location:".$selfBaseUrl."&version=".$version."&res=pass&msg=You have successfully saved the records!");
 }
 
 /*if (isset($_POST['back'])){
@@ -146,7 +148,7 @@ $MRC_CODE = $_POST['MRC_CODE'];
 $reference_no = $_POST['ref_no'];
 $createCopy = $crudapp->createCopy($conn,$ORG_CODE,$MRC_CODE,$reference_no,$year,$version,$cost_center,$user);
 sqlsrv_commit( $conn );
-header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$createCopy);
+header("Location:".$selfBaseUrl."&version=".$createCopy);
 }
 
 if (isset($_POST['endorsement'])){
@@ -192,11 +194,11 @@ $endorsementCtr = $crudapp->matchRecord2($conn,"R5_DPP_VERSION",'id',$condition)
 				$crudapp->sentEmail($conn,"eam@fdcutilities.com",$receiver,$subject,$body);			
 				
 				
-				header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=pass&msg=You have successfully submitted this APP for endorsement!");
+				header("Location:".$selfBaseUrl."&version=".$version."&res=pass&msg=You have successfully submitted this APP for endorsement!");
 			} else {
 				sqlsrv_rollback( $conn );
 				//echo "Transaction rolled back.<br />";
-				header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=fail&msg=Transaction rolled back!");
+				header("Location:".$selfBaseUrl."&version=".$version."&res=fail&msg=Transaction rolled back!");
 			}
 	}else{
 	$errorMessage ="You have an active endoresed APP!";
@@ -244,11 +246,11 @@ $endorsementCtr = $crudapp->matchRecord2($conn,"R5_DPP_VERSION",'id',$condition)
 				$receiver = @$receiverinfo[0]['PER_EMAILADDRESS'];
 				$crudapp->sentEmail($conn,"eam@fdcutilities.com",$receiver,$subject,$body);			
 				//echo "Transaction committed.<br />";
-				header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=pass&msg=You have successfully submitted this APP for review!");
+				header("Location:".$selfBaseUrl."&version=".$version."&res=pass&msg=You have successfully submitted this APP for review!");
 			} else {
 				sqlsrv_rollback( $conn );
 				//echo "Transaction rolled back.<br />";
-				header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=fail&msg=Transaction rolled back!");
+				header("Location:".$selfBaseUrl."&version=".$version."&res=fail&msg=Transaction rolled back!");
 			}
 	}else{
 	$errorMessage ="You have an active endoresed APP!";
@@ -303,11 +305,11 @@ $reference_no = $_POST['ref_no'];
 				}
 				
 				//echo "Transaction committed.<br />";
-				header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=pass&msg=You have successfully submitted this APP for revision!");
+				header("Location:".$selfBaseUrl."&version=".$version."&res=pass&msg=You have successfully submitted this APP for revision!");
 			} else {
 				sqlsrv_rollback( $conn );
 				//echo "Transaction rolled back.<br />";
-				header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=fail&msg=Transaction rolled back!");
+				header("Location:".$selfBaseUrl."&version=".$version."&res=fail&msg=Transaction rolled back!");
 			}
 }
 
@@ -446,7 +448,7 @@ $today = date("m/d/Y H:i");
 				//sqlsrv_rollback( $conn );
 				//echo "Transaction rolled back.<br />";
 			//}
-			header("Location:".$_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."&res=pass&msg=Record has been successfully inserted!#FormAnchor");
+			header("Location:".$selfBaseUrl."&version=".$version."&res=pass&msg=Record has been successfully inserted!#FormAnchor");
 	}else{
 		echo '<script>alert("Validation Error:\n\n'.$errorMessage.'");</script>';
 	}	
@@ -628,7 +630,7 @@ xmlhttp.send();
 
 //EAM TABLE
 function valideopenerform2(obj){	
-
+	event.preventDefault();
 	var code = $('#code').val();
 	var quantity = $('#quantity').val();
 	var cost = $('#cost').val();
@@ -836,9 +838,28 @@ var text = "";
 	}
 }
 
-$(document).ready(function(){
+function resetSechduledField() {
 	$('input.scheduleField').prop('readonly', true);
-	
+		var quarter = $("#budget_quarter").val();
+		switch(quarter) {
+			case "1":
+				$('#january, #february, #march').prop('readonly', false);
+				break;
+			case "2":
+				$('#april, #may, #june').prop('readonly', false);
+				break;
+			case "3":
+				$('#july, #august, #september').prop('readonly', false);
+				break;
+			case "4":
+				$('#october, #november, #december').prop('readonly', false);
+				break;
+			default:	
+		}
+		$(".scheduleField").val(0);
+}
+
+$(document).ready(function(){
 //Error Message
 var res = "<?php echo @$res;?>";
 $('.isa_info').show();
@@ -858,6 +879,7 @@ if(res !=""){
 	var version = "<?php echo $version; ?>";
 	var user = "<?php echo $user; ?>";
 	var year = "<?php echo $year; ?>";
+	var quarter = "<?php echo $quarter; ?>";
 	var reference_no = "<?php echo $reference_no; ?>";
 	var bo = parseInt("<?php echo $bo; ?>");
 	var fi = parseInt("<?php echo $fi; ?>");
@@ -951,7 +973,8 @@ if(expired > 0 && version < 2){
 }
 	
 	$("#year_budget").val(year);
-	
+	$("#budget_quarter").val(quarter);
+	resetSechduledField();
 	/*var counter = 0;
     $(".list th").each(function(){
         var width = $('.list tr:last td:eq(' + counter + ')').width();
@@ -970,11 +993,11 @@ if(expired > 0 && version < 2){
 	
 		//Save Button
 	$("#tabURL").click(function() {
-		window.location = "dpp-record-lines-cost.php?login="+user+"&year="+year+"&reference_no="+reference_no+"&version="+version;
+		window.location = "dpp-record-lines-cost.php?login="+user+"&year="+year+"&quarter="+quarter+"&reference_no="+reference_no+"&version="+version;
 	});
 	
 	$("#newRecord").click(function() {
-		window.location = "dpp-record-lines-item.php?login="+user+"&year="+year+"&reference_no="+reference_no+"&version="+version;
+		window.location = "dpp-record-lines-item.php?login="+user+"&year="+year+"&quarter="+quarter+"&reference_no="+reference_no+"&version="+version;
 	});
 	
 	$("#save_tmp").click(function() {
@@ -1146,24 +1169,7 @@ if(expired > 0 && version < 2){
 	});
 
 	$("#budget_quarter").change(function(e) {
-		$('input.scheduleField').prop('readonly', true);
-		var quarter = $(this).val();
-		switch(quarter) {
-			case "1":
-				$('#january, #february, #march').prop('readonly', false);
-				break;
-			case "2":
-				$('#april, #may, #june').prop('readonly', false);
-				break;
-			case "3":
-				$('#july, #august, #september').prop('readonly', false);
-				break;
-			case "4":
-				$('#october, #november, #december').prop('readonly', false);
-				break;
-			default:	
-		}
-		$(".scheduleField").val(0);
+		resetSechduledField();
 	}); 
 
 	
@@ -1189,7 +1195,7 @@ if(expired > 0 && version < 2){
 </script>
 </head>
 <body>
-<form action="<?php echo $_SERVER['PHP_SELF']."?login=".$user."&year=".$year."&reference_no=".$reference_no."&version=".$version."#FormAnchor"; ?>" method="post" name="theForm" enctype="multipart/form-data">
+<form action="<?php echo $selfBaseUrl."&version=".$version."#FormAnchor"; ?>" method="post" name="theForm" enctype="multipart/form-data">
 <div class="headerText2"><div id="divText">Annual Procurement Plan</div></div>
 <div class="isa_info"><b>Deadline of budget submission is on: </b><?php echo $expiration_orig; ?></div>
 <div class="isa_success"><?php echo $msg; ?></div>
@@ -1222,7 +1228,7 @@ if(expired > 0 && version < 2){
 			<td class="textField"><input type="hidden" class="field" name="ref_no" id="ref_no" spellcheck="false" tabindex="1" value= "<?php echo $reference_no;?>"><input type="text" class="field" name="organization" id="organization" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['ORG_DESC'];?>" readonly><input type="hidden" class="field" name="ORG_CODE" id="ORG_CODE" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['ORG_CODE'];?>"></td>			
 			<td class="textLabel">Budget Year:</td>
 			<td class="textField">
-				<select name="year_budget" id="year_budget" readonly>
+				<select name="year_budget" class="readonly"  id="year_budget">
 					<option value="">-- Please select --</option>
 					<option value="2014">2014</option>
 					<option value="2015">2015</option>
@@ -1259,7 +1265,7 @@ if(expired > 0 && version < 2){
 			<td class="textField"><input type="text" class="field" name="department" id="department" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['MRC_DESC'];?>" readonly><input type="hidden" class="field" name="MRC_CODE" id="MRC_CODE" spellcheck="false" tabindex="1" value= "<?php echo $dppinfo[0]['MRC_CODE'];?>"></td>				
 			<td class="textLabel">Budget Quarter:</td>
 				<td class="textField">
-					<select name="budget_quarter" id="budget_quarter">
+					<select name="budget_quarter" class="readonly" id="budget_quarter">
 					<option value="">-- Please select --</option>
 					<option value="1">1st</option>
 					<option value="2">2nd</option>
@@ -1272,7 +1278,7 @@ if(expired > 0 && version < 2){
 			<td class="textLabel">Cost Center:</td>
 			<td class="textField"><input type="text" class="field" name="cost_center" id="cost_center" spellcheck="false" tabindex="1" value="<?php echo $cost_center; ?>" readonly></td>				
 			<td class="textLabel">Remarks:</td>
-			<td class="textField"><textarea name="remarks" cols="50" readonly><?php echo $remarks;?></textarea></td>				
+			<td class="textField"><textarea name="remarks" cols="50" readonly class="readonly"><?php echo $remarks;?></textarea></td>				
 		</tr>
 	</tbody>
 </table>

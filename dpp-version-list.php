@@ -86,11 +86,12 @@ xmlhttp.onreadystatechange=function()
   if (xmlhttp.readyState==4 && xmlhttp.status==200)
     {
 	 var json = $.parseJSON(xmlhttp.responseText);
+	 var quarter = json['quarter_budget'];
 	 var year = json['year_budget'];
 	 var version = json['version'];
 	  var reference_no = json['reference_no'];
 	 var user = "<?php echo $user;?>";
-	 window.location = "dpp-record-lines-item.php?login="+user+"&year="+year+"&version="+version+"&reference_no="+reference_no;
+	 window.location = "dpp-record-lines-item.php?login="+user+"&year="+year+"&quarter="+quarter+"&version="+version+"&reference_no="+reference_no;
     }
   }
 xmlhttp.open("GET","ajax/get-dpp-version-info.php?hash="+text+"&id="+id,true);
